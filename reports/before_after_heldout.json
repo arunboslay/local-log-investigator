@@ -1,0 +1,125 @@
+{
+  "base_llama_heldout": {
+    "backend": "llama",
+    "adapter_used": false,
+    "examples": 192,
+    "minutes": 13.3,
+    "accuracy": {
+      "parsed": 0.984,
+      "really_succeeded": 0.979,
+      "problem": 0.901,
+      "error_location": 0.672,
+      "root_cause_location": 0.38,
+      "missing_step": 0.401,
+      "all_right": 0.333
+    },
+    "correct_by_fault_family": {
+      "n_plus_one": {
+        "n": 64,
+        "really_succeeded": 62,
+        "problem": 48,
+        "error_location": 36,
+        "root_cause_location": 20,
+        "all_right": 17
+      },
+      "payment_down": {
+        "n": 64,
+        "really_succeeded": 64,
+        "problem": 64,
+        "error_location": 64,
+        "root_cause_location": 30,
+        "all_right": 30
+      },
+      "pool_exhausted": {
+        "n": 64,
+        "really_succeeded": 62,
+        "problem": 61,
+        "error_location": 29,
+        "root_cause_location": 23,
+        "all_right": 17
+      }
+    }
+  },
+  "before_heldout60": {
+    "backend": "unsloth",
+    "adapter_used": false,
+    "examples": 60,
+    "minutes": 59.3,
+    "accuracy": {
+      "parsed": 1.0,
+      "really_succeeded": 0.95,
+      "problem": 0.8,
+      "error_location": 0.533,
+      "root_cause_location": 0.483,
+      "missing_step": 0.35,
+      "all_right": 0.35
+    },
+    "correct_by_fault_family": {
+      "n_plus_one": {
+        "n": 20,
+        "really_succeeded": 17,
+        "problem": 8,
+        "error_location": 6,
+        "root_cause_location": 6,
+        "all_right": 6
+      },
+      "payment_down": {
+        "n": 20,
+        "really_succeeded": 20,
+        "problem": 20,
+        "error_location": 18,
+        "root_cause_location": 9,
+        "all_right": 9
+      },
+      "pool_exhausted": {
+        "n": 20,
+        "really_succeeded": 20,
+        "problem": 20,
+        "error_location": 8,
+        "root_cause_location": 14,
+        "all_right": 6
+      }
+    }
+  },
+  "after_heldout60": {
+    "backend": "unsloth",
+    "adapter_used": true,
+    "examples": 60,
+    "minutes": 68.8,
+    "accuracy": {
+      "parsed": 1.0,
+      "really_succeeded": 1.0,
+      "problem": 0.75,
+      "error_location": 1.0,
+      "root_cause_location": 0.517,
+      "missing_step": 1.0,
+      "all_right": 0.483
+    },
+    "correct_by_fault_family": {
+      "n_plus_one": {
+        "n": 20,
+        "really_succeeded": 20,
+        "problem": 6,
+        "error_location": 20,
+        "root_cause_location": 8,
+        "all_right": 6
+      },
+      "payment_down": {
+        "n": 20,
+        "really_succeeded": 20,
+        "problem": 20,
+        "error_location": 20,
+        "root_cause_location": 6,
+        "all_right": 6
+      },
+      "pool_exhausted": {
+        "n": 20,
+        "really_succeeded": 20,
+        "problem": 19,
+        "error_location": 20,
+        "root_cause_location": 17,
+        "all_right": 17
+      }
+    }
+  }
+}

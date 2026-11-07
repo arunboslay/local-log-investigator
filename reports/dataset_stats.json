@@ -1,0 +1,55 @@
+{
+  "train": {
+    "examples": 570,
+    "by_problem": {
+      "failed": 171,
+      "none": 255,
+      "silent_failure": 112,
+      "slow": 32
+    },
+    "by_family": {
+      "bad_config": 113,
+      "database": 37,
+      "dependency": 59,
+      "none": 53,
+      "npe": 72,
+      "silent_save": 174,
+      "slow_query": 62
+    },
+    "avg_chars": 2979
+  },
+  "valid": {
+    "examples": 63,
+    "by_problem": {
+      "failed": 22,
+      "none": 35,
+      "silent_failure": 5,
+      "slow": 1
+    },
+    "by_family": {
+      "bad_config": 15,
+      "database": 7,
+      "dependency": 5,
+      "none": 7,
+      "npe": 8,
+      "silent_save": 15,
+      "slow_query": 6
+    },
+    "avg_chars": 2937
+  },
+  "test_heldout": {
+    "examples": 192,
+    "by_problem": {
+      "failed": 87,
+      "none": 60,
+      "slow": 1,
+      "too_many_queries": 44
+    },
+    "by_family": {
+      "n_plus_one": 64,
+      "payment_down": 64,
+      "pool_exhausted": 64
+    },
+    "avg_chars": 2745
+  }
+}

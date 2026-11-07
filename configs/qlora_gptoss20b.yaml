@@ -1,0 +1,34 @@
+# Fine-tune OpenAI gpt-oss-20b on the RTX 5070 Ti (16 GB) with Unsloth 4-bit QLoRA.
+# Task: read one request's log lines + the Java code they come from, and say what really happened.
+# Data: monitoring/dataset/data/train.jsonl (built by monitoring/dataset/build_log_code_sft.py).
+run_name: gptoss_logcode
+
+model: unsloth/gpt-oss-20b-unsloth-bnb-4bit   # 11.7 GB download the first time
+max_seq_length: 2048    # tokens per example; the longest (checkout requests) are ~1,870
+
+lora:
+  r: 8              # size of the add-on. Fit check: r=8 at 2048 tokens peaks at 14.7 GB, ~15 s/step.
+                    # r=16 at 2048 needed 16.2 GB: more than the card, so it spilled into slow shared memory.
+  alpha: 16
+  dropout: 0
+  # Attention layers plus the expert (MLP) layers, as Unsloth recommends for gpt-oss.
+  target_modules: [q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj]
+
+data:
+  train: monitoring/dataset/data/train.jsonl
+
+# Passed through to trl.SFTConfig.
+train:
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 8   # 8 examples per update
+  num_train_epochs: 2
+  learning_rate: 2.0e-4
+  warmup_steps: 10
+  lr_scheduler_type: linear
+  optim: adamw_8bit
+  weight_decay: 0.01
+  logging_steps: 1
+  save_strategy: steps
+  save_steps: 50
+  save_total_limit: 2
+  seed: 3407

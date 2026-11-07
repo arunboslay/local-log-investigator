@@ -1,0 +1,25 @@
+[project]
+name = "local-log-investigator"
+version = "0.1.0"
+description = "Local, offline AI investigator for Spring Boot logs and code"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "fastapi",
+    "httpx",
+    "prometheus-client",
+    "psutil",
+    "pyyaml",
+    "torch",
+    "uvicorn",
+]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

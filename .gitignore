@@ -1,0 +1,24 @@
+.venv*/
+__pycache__/
+*.pyc
+.pytest_cache/
+unsloth_compiled_cache/
+outputs/
+checkpoints/
+*.safetensors
+*.gguf
+*.bin
+*.pt
+wandb/
+*.log
+
+# Created by setup and by running the lab: raw logs, generated data, model output
+monitoring/demo_app/
+monitoring/run/
+monitoring/code_index.json
+monitoring/incidents/
+monitoring/investigator_runs/
+monitoring/dataset/runs/
+monitoring/dataset/results/
+monitoring/dataset/data/*
+!monitoring/dataset/data/sample_5.jsonl
