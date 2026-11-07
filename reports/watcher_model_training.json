@@ -1,0 +1,22 @@
+{
+  "requests": 61429,
+  "forest_train_seconds": 0.6,
+  "forest_cpu_ms_per_request": 4.75,
+  "sequence": {
+    "params": 27028,
+    "vocab": 20,
+    "train_requests": 61429,
+    "epochs": 4,
+    "train_seconds": 1.6,
+    "device": "cuda",
+    "losses": [
+      0.5845,
+      0.0253,
+      0.0091,
+      0.0076
+    ]
+  },
+  "sequence_top_k": 2,
+  "sequence_cpu_ms_per_request": 0.1,
+  "sequence_flag_rate_on_training_traffic": 0.0
+}

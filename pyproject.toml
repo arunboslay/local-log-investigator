@@ -9,6 +9,7 @@ dependencies = [
     "prometheus-client",
     "psutil",
     "pyyaml",
+    "scikit-learn",
     "torch",
     "uvicorn",
 ]

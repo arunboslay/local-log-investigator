@@ -22,3 +22,6 @@ monitoring/dataset/runs/
 monitoring/dataset/results/
 monitoring/dataset/data/*
 !monitoring/dataset/data/sample_5.jsonl
+monitoring/watcher/data/
+monitoring/watcher/models/
+monitoring/watcher/flagged/

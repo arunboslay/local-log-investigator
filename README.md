@@ -30,13 +30,15 @@ here runs locally.
 ## Design
 
 ```
-Spring Boot app -- logs + metrics --> watcher --> investigator (one local model + tools) --> report --> human
-                                     (planned)        |
-                                                      +-- search logs, read metrics, list commits,
-                                                          show diffs, look up code, read files
+Spring Boot app -- live logs --> watcher --> flag --> investigator (one local model + tools) --> report --> human
+                                 (plain rules,            |
+                                  no AI, no GPU)          +-- search logs, read metrics, list commits,
+                                                              show diffs, look up code, read files
 ```
 
-- **Watcher: not built yet.** Today an investigation is started by hand on a recorded incident.
+- **Watcher:** follows the log file and runs plain checks, with no model and no GPU: new error patterns,
+  jumps in error rate, p95 latency, query count and traffic, and **missing steps** (a 2xx request that
+  skipped a step the code should have logged, which is how it catches silent saves).
 - **Investigator:** one local model with read-only tools, served by llama.cpp. It ends with a report:
   what broke, the suspect commit, file and line, how sure it is, and the evidence.
 - **Code map:** links each endpoint to its controller, service and repository methods, and each log
@@ -66,6 +68,37 @@ stack trace or the log line that hid the error, and the known guilty line.
 cause, the guilty commit and the guilty file.
 
 ## Results
+
+### Watcher: do you need a trained anomaly model?
+
+On this app, no. I compared plain rules with two small models trained only on normal traffic: an
+Isolation Forest and a tiny LSTM that predicts the next log line (DeepLog style). Test: 31 recorded
+fault runs the rules were not adjusted on, plus 30 minutes of clean traffic. Details are in
+[reports/watcher_eval.md](reports/watcher_eval.md).
+
+| Detector | Faults flagged | Flags per hour on clean traffic |
+|---|---|---|
+| Rules, already running | **29 of 31** (median 1 s) | 4.0 |
+| Rules, just started | 27 of 31 | 4.0 |
+| LSTM sequence model | 25 of 31 | 2.0 |
+| Rules + LSTM | 27 of 31 (just-started rules) | 5.9 |
+| Isolation Forest | 5 of 31 | 25.7 |
+
+The LSTM caught nothing the rules missed, so the watcher uses rules only by default. The "clean" flags
+for rules and LSTM all came from one real payment timeout during that recording. The rules read about
+127,000 log lines per second on one CPU thread when no error text needs masking.
+
+**Live demo** (one run, silent-save fault): flagged 0.3 s after the bad deploy went live, with no flags
+in the 90 s before it. The investigator's report came 37 s after the flag, with the right category,
+commit and file. It named the wrong line (38, not 41) and wrongly said the phone field was left empty,
+when the customer wasn't saved at all. A second run flagged in 0.2 s and reported in 31 s, this time
+describing the failure correctly, so answers vary between runs. Both use gpt-oss-20b without the
+fine-tuned add-on.
+
+**Limits:** the memory leak isn't found, because it doesn't show in logs. The slow product query is
+missed even with a baseline. Short-running watchers can't judge speed yet. The missing-step check only
+works for steps the code logs, and a request step inside an `if` could cause false alarms. The rules
+were written knowing these faults, on one small app I wrote, so real traffic will be harder.
 
 ### Fine-tuning: before and after
 
@@ -154,6 +187,22 @@ Run the investigator. Put `llama-server.exe` from a
 uv run python monitoring/investigator/run_baseline.py
 ```
 
+Watch live, and run the investigator on the first flag (flags go to `monitoring/run/alerts.jsonl`):
+
+```powershell
+uv run python monitoring/watcher/watch.py --investigate
+uv run python monitoring/watcher/live_demo.py     # or: app + traffic + watcher + a fault, timed end to end
+```
+
+Repeat the detector comparison (about 2 hours of recording; it also needs the dataset runs below):
+
+```powershell
+uv run python monitoring/watcher/record_normal.py --name train_normal --minutes 75
+uv run python monitoring/watcher/record_normal.py --name clean_normal --minutes 30
+uv run python monitoring/watcher/train_models.py --data monitoring/watcher/data/train_normal
+uv run python monitoring/watcher/compare.py
+```
+
 Build the training data (about an hour) and score the untrained model:
 
 ```powershell
@@ -186,6 +235,7 @@ monitoring/
   record_incident.py   records one incident
   redact.py            personal data masking (tests in tests/)
   code_index.py        endpoint -> controller -> service -> repository map
+  watcher/             live log follower, rule checks, the two compared models, evaluation
   investigator/        tools, agent loop, llama.cpp wrapper, scorer
   dataset/             fault variants, request recorder, example builder, scorer
     data/sample_5.jsonl   5 example training records, so you can see the format
@@ -202,7 +252,8 @@ reports/               result numbers
    out specific bugs.
 4. Re-measure the investigator with the diff fix, several runs per incident.
 5. Search past incidents for similar failures, and measure whether it helps.
-6. Build the watcher.
+6. Give the watcher a saved baseline, so a restart doesn't lose what normal looks like, and group one
+   fault's several flags into one alert.
 7. Test on a second Spring Boot app I didn't write.
 
 ## License
